@@ -1,0 +1,14 @@
+{
+    "name": "root/html",
+    "description": "API PHP PROJECT",
+    "autoload": {
+        "psr-4": {
+            "Root\\Html\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.0",
+        "firebase/php-jwt": "^5.0",
+        "vlucas/phpdotenv": "^5.0"
+    }
+}
