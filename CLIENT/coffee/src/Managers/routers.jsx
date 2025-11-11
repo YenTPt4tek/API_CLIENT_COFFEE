@@ -4,11 +4,12 @@ import { routeConfig } from "./Define/routeConfig";
 import LoginPage from "../Components/Login/LoginPage";
 import DashboardLayout from "./Layout/DashboardLayout";
 import ProtectedRoute from "./Define/ProtectedRoute";
-import { useAuth } from "../Components/AuthContext/AuthContext";
+import { useAuth } from "../Hook/AuthContext/AuthContext";
 import { toast } from "react-toastify"; // ⚡ Thông báo đẹp
 
 export default function ManagersRouters() {
   const { user, loading } = useAuth();
+
 
   // 🧠 Hàm kiểm tra quyền truy cập route
   const hasAccess = (route) => {

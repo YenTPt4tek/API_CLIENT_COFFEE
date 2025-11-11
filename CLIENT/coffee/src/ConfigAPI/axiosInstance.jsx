@@ -4,7 +4,7 @@ import axios from "axios";
 // 🔹 Tạo instance chung
 const axiosInstance = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
-    timeout: 30000,
+    timeout: 20000,
     headers: {
         "Content-Type": "application/json",
     },

@@ -1,46 +1,77 @@
-
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import HeaderLayout from "./HeaderLayout";
 import SibarLayout from "./SideBarLayout";
 import FooterLayout from "./FooterLayout";
-import { useEffect } from "react";
-
 import { loadDashboardHeadAssets } from "../Component/LoadStyleandScript/loadDashboardHeadAssets";
-
 import { loadDashboardScripts } from "../Component/LoadStyleandScript/loadDashboardScripts";
-import { useAuth } from "../../Components/AuthContext/AuthContext";
-
+import { useAuth } from "../../Hook/AuthContext/AuthContext";
+import { MDBSpinner } from "mdb-react-ui-kit";
 
 const DashboardLayout = () => {
-    const navigate = useNavigate();
     const { user } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [renderDashboard, setRenderDashboard] = useState(false); // control render
+
     useEffect(() => {
+        if (!user || !user.role) {
+            setLoading(false);
+            return;
+        }
+
+        let timer;
+
         const initDashboard = async () => {
             try {
-                // 🚫 Nếu chưa có user hoặc chưa có role => chuyển đến trang login
-                if (!user || !user.role) {
-                    navigate("/managers/login", { replace: true });
-                    return; // ⛔ Dừng lại, không load CSS/JS
-                }
-
-                // ✅ Nếu có user, load asset
+                // Load CSS
                 await loadDashboardHeadAssets();
+                await new Promise(r => requestAnimationFrame(r)); // chờ CSS apply
+
+                // Load JS
                 await loadDashboardScripts();
 
-            } catch (error) {
-                console.error("⚠️ Lỗi khi load CSS/JS dashboard:", error);
+                // ✅ delay render dashboard bằng setTimeout (ví dụ tối thiểu 500ms)
+                timer = setTimeout(() => {
+                    setRenderDashboard(true); // mới render Header, Sidebar, Outlet, Footer
+                }, 500);
+            } catch (err) {
+                console.error(err);
+                setRenderDashboard(true); // fallback vẫn render dashboard nếu lỗi
+            } finally {
+                setLoading(false);
             }
         };
 
         initDashboard();
-    }, [user, navigate]);
 
-    // ⏳ Nếu chưa có user => không render dashboard layout
-    if (!user || !user.role) {
-        return null;
+        return () => clearTimeout(timer); // cleanup khi unmount
+    }, [user]);
+
+    if (!user || !user.role) return null;
+
+    // Spinner
+    if (loading) {
+        return (
+            <div
+                style={{
+                    height: "100vh",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                }}
+            >
+                <MDBSpinner grow role="status" color="primary">
+                    <span className="visually-hidden">Loading...</span>
+                </MDBSpinner>
+                <p className="mt-3">Account Loading...</p>
+            </div>
+        );
     }
-    return (
+
+    // Render Dashboard sau timeout
+    return renderDashboard ? (
         <>
             <HeaderLayout />
             <SibarLayout />
@@ -49,7 +80,7 @@ const DashboardLayout = () => {
             </main>
             <FooterLayout />
         </>
-    );
+    ) : null;
 };
 
 export default DashboardLayout;

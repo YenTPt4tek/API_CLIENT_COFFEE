@@ -4,7 +4,6 @@ import { ensureStylesheet, ensureLinkImmediate } from "../../../Define/assetLoad
 export const loadDashboardHeadAssets = () => {
     document.title = "Managers Coffee";
     const base = process.env.REACT_APP_ADMIN_PATH;
-    console.log("ENV TEST:", process.env.REACT_APP_ADMIN_PATH);
 
 
     // extras: preconnect / google fonts / favicons (chèn 1 lần, không chờ load)

@@ -2,7 +2,7 @@
 import React from "react";
 import SimpleLink from "../Component/SideBar/SimpleLink";
 import GroupLink from "../Component/SideBar/GroupLink";
-import { useAuth } from "../../Components/AuthContext/AuthContext";
+import { useAuth } from "../../Hook/AuthContext/AuthContext";
 
 
 const navItems = [
