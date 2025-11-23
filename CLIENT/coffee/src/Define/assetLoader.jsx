@@ -32,49 +32,42 @@ export function ensureScript(src, { async = false } = {}) {
 }
 
 // 🧩 Đảm bảo load stylesheet (chờ trình duyệt apply xong)
-export function ensureStylesheet(href) {
-    if (__cache[href]) return __cache[href];
+export function ensureStylesheet(href, { page } = {}) {
+  if (__cache[href]) return __cache[href];
 
-    __cache[href] = new Promise((resolve, reject) => {
-        const existing = document.querySelector(`link[rel="stylesheet"][href="${href}"]`);
+  __cache[href] = new Promise((resolve, reject) => {
+    const existing = document.querySelector(`link[rel="stylesheet"][href="${href}"]`);
+    if (existing) {
+      if (existing.getAttribute("data-loaded") === "true") {
+        return requestAnimationFrame(() => resolve(existing));
+      }
+      existing.addEventListener("load", () => requestAnimationFrame(() => resolve(existing)), { once: true });
+      existing.addEventListener("error", reject, { once: true });
+      return;
+    }
 
-        if (existing) {
-            if (existing.getAttribute("data-loaded") === "true") {
-                // nếu CSS đã load → delay 1 frame để apply style
-                return requestAnimationFrame(() => resolve(existing));
-            }
-            // nếu chưa load → add listener
-            existing.addEventListener(
-                "load",
-                () => requestAnimationFrame(() => resolve(existing)),
-                { once: true }
-            );
-            existing.addEventListener("error", (e) => reject(e), { once: true });
-            return;
-        }
+    const l = document.createElement("link");
+    l.rel = "stylesheet";
+    l.href = href;
+    if (page) l.setAttribute("data-page", page);
 
-        const l = document.createElement("link");
-        l.rel = "stylesheet";
-        l.href = href;
+    const timeout = setTimeout(() => resolve(l), 10000);
 
-        // timeout dự phòng 10s để tránh Promise treo
-        const timeout = setTimeout(() => resolve(l), 10000);
+    l.onload = () => {
+      clearTimeout(timeout);
+      l.setAttribute("data-loaded", "true");
+      requestAnimationFrame(() => resolve(l));
+    };
 
-        l.onload = () => {
-            clearTimeout(timeout);
-            l.setAttribute("data-loaded", "true");
-            requestAnimationFrame(() => resolve(l)); // ✅ CSS đã apply xong
-        };
+    l.onerror = (e) => {
+      clearTimeout(timeout);
+      reject(new Error(`❌ Failed to load CSS: ${href}`));
+    };
 
-        l.onerror = (e) => {
-            clearTimeout(timeout);
-            reject(new Error(`❌ Failed to load CSS: ${href}`));
-        };
+    document.head.appendChild(l);
+  });
 
-        document.head.appendChild(l);
-    });
-
-    return __cache[href];
+  return __cache[href];
 }
 
 // 🧩 Chèn link (font, icon...) không cần chờ load

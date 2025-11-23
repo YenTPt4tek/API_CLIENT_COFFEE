@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { routeConfig } from "./Define/routeConfig";
-import LoginPage from "../Components/Login/LoginPage";
+import AuthPage  from "../Components/Auth/AuthPage";
 import DashboardLayout from "./Layout/DashboardLayout";
 import ProtectedRoute from "./Define/ProtectedRoute";
 import { useAuth } from "../Hook/AuthContext/AuthContext";
@@ -34,7 +34,7 @@ export default function ManagersRouters() {
   return (
     <Routes>
       {/* 🔑 Trang đăng nhập */}
-      <Route path="login" element={<LoginPage />} />
+      <Route path="login" element={<AuthPage  />} />
 
       {/* 🧩 Các route động dựa theo routeConfig */}
       {Object.entries(routeConfig).map(([groupKey, group]) =>

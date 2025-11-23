@@ -1,11 +1,11 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../Hook/AuthContext/AuthContext";
 
 const ProtectedRoute = ({ element, allowedRoles, allowedPermissions }) => {
   const { user, loading } = useAuth();
-
-  console.log("ProtectedRoute:", { user, loading });
+  const location = useLocation();
+  //console.log("ProtectedRoute:", { user, loading });
 
   if (loading) {
     return (
@@ -25,7 +25,7 @@ const ProtectedRoute = ({ element, allowedRoles, allowedPermissions }) => {
 
   if (!user) {
     console.warn("⚠️ Chưa đăng nhập");
-    return <Navigate to="/managers/login" replace />;
+    return <Navigate to="/managers/login" replace state={{ from:location }} />;
   }
 
   const userRole = user.role;

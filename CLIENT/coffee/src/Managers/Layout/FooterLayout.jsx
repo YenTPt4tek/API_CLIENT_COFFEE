@@ -1,7 +1,7 @@
 const FooterLayout = () => {
     return (
         <>
-            <footer id="footer" className="footer">
+            <footer id="footer" className="footer" data-aos="fade-up" data-aos-delay="200">
                 {/* <div className="copyright">
                     &copy; Coffee <strong><span>NiceAdmin</span></strong>. All Rights Reserved
                 </div>

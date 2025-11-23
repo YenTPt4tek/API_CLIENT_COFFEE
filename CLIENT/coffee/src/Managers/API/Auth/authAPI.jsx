@@ -1,26 +1,26 @@
 import { httpService } from "../../../httpServices/httpServices";
 
 // 🧩 Đăng ký user
-export const registerUser = async (username, email, password, role = "Customer") => {
+export const registerUser = async (full_name, username, email, password, role = "Customer") => {
     try {
-        const response = await httpService.post(`/auth/register?role=${role}`, {
+        const data = await httpService.post(`/auth/register?role=${role}`, {
+            full_name,
             username,
             email,
             password,
         });
 
-        const data = response || response?.data ;
-
-        if (data?.data?.token) {
-            localStorage.setItem("token", data.data.token);
+        if (data?.token) {
+            localStorage.setItem("token", data.token);
         }
 
         return data;
     } catch (error) {
-        console.error("❌ Lỗi khi đăng ký:", error.response || error.message);
-        throw new Error(error.response?.data?.message || "Đăng ký thất bại, vui lòng thử lại!");
+        console.error("❌ Lỗi khi đăng ký:", error);
+        throw new Error(error.message || "Đăng ký thất bại, vui lòng thử lại!");
     }
 };
+
 
 // 🧩 Đăng nhập user
 export const loginUser = async (email, password) => {
@@ -28,7 +28,7 @@ export const loginUser = async (email, password) => {
         const response = await httpService.post("/auth/login", { email, password });
         const data = response || response?.data ;
 
-        if (data?.data?.token) {
+        if (data?.token) {
             localStorage.setItem("token", data.data.token);
         }
 

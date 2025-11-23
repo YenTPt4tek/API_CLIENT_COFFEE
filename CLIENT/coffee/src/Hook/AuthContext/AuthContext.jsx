@@ -10,30 +10,38 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const token = getToken();
+        if (!token) {
+            setLoading(false);
+            return;
+        }
 
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
+        try {
+            const decoded = jwtDecode(token);
+
+            // kiểm tra token hết hạn
+            if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+                removeToken();
+                setUser(null);
+            } else {
                 setUser({
                     token,
                     role: decoded.role_name?.toLowerCase() || null,
                     info: decoded,
                 });
-            } catch (error) {
-                console.error("❌ Invalid token:", error);
-                removeToken();
-                setUser(null);
             }
-        } else {
+        } catch (error) {
+            console.error("❌ Invalid token:", error);
+            removeToken();
             setUser(null);
         }
 
         setLoading(false);
-    }, []); // ✅ chỉ chạy 1 lần khi load app
+    }, []);
 
     const login = (token) => {
         saveToken(token);
         const decoded = jwtDecode(token);
+
         setUser({
             token,
             role: decoded.role_name?.toLowerCase() || null,
